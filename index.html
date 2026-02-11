@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CITY GATE | Social Allocation Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+    <div class="noise"></div>
+
+    <main id="app">
+        <!-- PAGE 1: IDENTITY INPUT -->
+        <section id="screen-identity" class="screen active">
+            <div class="center-content">
+                <h1 class="glitch" data-text="CITY GATE">CITY GATE</h1>
+                <h2 class="subtitle">SOCIAL HOUSING ALLOCATION</h2>
+                <div class="divider"></div>
+                <p class="protocol-text">UTOPIA / DYSTOPIA PARTITION PROTOCOL v9.2</p>
+
+                <div class="input-group">
+                    <input type="text" id="citizen-name" placeholder="ENTER FULL NAME" autocomplete="off"
+                        spellcheck="false">
+                    <div class="input-line"></div>
+                </div>
+
+                <button id="btn-start" class="cyber-btn">
+                    <span class="btn-text">START PROCESS</span>
+                    <span class="btn-glitch"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- PAGE 2: SCAN + PROFILE -->
+        <section id="screen-processing" class="screen hidden">
+            <div class="grid-layout">
+
+                <!-- LEFT PANEL: CITY MAP -->
+                <div class="panel panel-left">
+                    <div class="panel-header">HOUSING ALLOCATION FEED</div>
+                    <div class="map-container">
+                        <!-- Live Map Feed (Static Fallback) -->
+                        <div class="map-frame"></div>
+
+                        <!-- Digital Overlay -->
+                        <div class="map-grid-overlay"></div>
+
+                        <!-- HUD Layer -->
+                        <svg class="city-map-svg" viewBox="0 0 400 300" preserveAspectRatio="none">
+                            <defs>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <!-- Targeting Reticle -->
+                            <g id="map-target" class="map-target hidden" filter="url(#glow)">
+                                <circle cx="0" cy="0" r="20" stroke="var(--neon-cyan)" fill="none" stroke-width="2" />
+                                <circle cx="0" cy="0" r="5" fill="var(--neon-cyan)" />
+                                <line x1="0" y1="-30" x2="0" y2="30" stroke="var(--neon-cyan)" stroke-width="1" />
+                                <line x1="-30" y1="0" x2="30" y2="0" stroke="var(--neon-cyan)" stroke-width="1" />
+                            </g>
+                        </svg>
+
+                        <div class="map-overlay-text">
+                            LOCATING UNIT...
+                        </div>
+                    </div>
+                    <div class="status-box">
+                        <span class="status-label">SAT-LINK:</span>
+                        <span class="status-val blink">CONNECTED</span>
+                    </div>
+                </div>
+
+                <!-- CENTER PANEL: CAMERA SCAN -->
+                <div class="panel panel-center">
+                    <div class="scanner-frame">
+                        <div class="corner c-tl"></div>
+                        <div class="corner c-tr"></div>
+                        <div class="corner c-bl"></div>
+                        <div class="corner c-br"></div>
+
+                        <video id="camera-feed" autoplay playsinline muted></video>
+                        <canvas id="photo-canvas" class="hidden"></canvas>
+                        <div id="scan-overlay" class="scan-overlay">
+                            <div class="scan-line"></div>
+                            <div class="scan-text">SCANNING SUBJECT...</div>
+                        </div>
+                        <div class="fallback-silhouette" id="camera-fallback" style="display: none;">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='cyan' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
+                                alt="Silhouette">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL: PROFILE DATA -->
+                <div class="panel panel-right">
+                    <div class="panel-header">SUBJECT PROFILE</div>
+
+                    <div class="data-row">
+                        <span class="label">NAME:</span>
+                        <span class="value" id="display-name">UNKNOWN</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">SOCIAL ID:</span>
+                        <span class="value" id="display-id">--- --- ---</span>
+                    </div>
+
+                    <div class="divider-small"></div>
+
+                    <div class="data-group">
+                        <span class="label">CRIMINAL RECORD:</span>
+                        <ul id="crime-list" class="crime-list">
+                            <!-- Crimes injected here -->
+                        </ul>
+                    </div>
+
+                    <div class="score-calculation">
+                        <div class="calc-row">
+                            <span>BASE SCORE:</span>
+                            <span id="score-base">...</span>
+                        </div>
+                        <div class="calc-row penalty">
+                            <span>PENALTIES:</span>
+                            <span id="score-penalty">...</span>
+                        </div>
+                        <div class="calc-row total">
+                            <span>PRELIMINARY SCR:</span>
+                            <span id="score-total">CALCULATING...</span>
+                        </div>
+                    </div>
+
+                    <button id="btn-verdict" class="cyber-btn small disabled">
+                        <span class="btn-text">CONTINUE TO VERDICT</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 3: ALLOCATION VERDICT -->
+        <section id="screen-verdict" class="screen hidden">
+            <div class="verdict-container">
+                <div id="verdict-status" class="verdict-status">PROCESSING...</div>
+
+                <h1 id="verdict-title" class="verdict-title">---</h1>
+
+                <div class="verdict-details">
+                    <p id="verdict-message">Awaiting final calculation...</p>
+                    <div class="final-score-display">
+                        <span>FINAL SOCIAL SCORE:</span>
+                        <span id="verdict-score" class="score-anim">000</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="btn-restart" class="cyber-btn secondary">
+                        <span class="btn-text">RESTART SYSTEM</span>
+                    </button>
+                    <button id="btn-review" class="cyber-btn secondary">
+                        <span class="btn-text">VIEW PROFILE</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
