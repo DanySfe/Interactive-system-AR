@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CITY GATE | Social Allocation Terminal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,11 +14,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-
-    <div class="scanlines"></div>
+<body class="state-neutral">
+    <!-- Split Background -->
+    <div id="particles-left" class="half-bg"></div>
+    <div id="particles-right" class="half-bg"></div>
     <div class="vignette"></div>
     <div class="noise"></div>
+
+    <!-- HUD System Overlay -->
+    <div class="hud-interface">
+        <div class="hud-border top-left"></div>
+        <div class="hud-border top-right"></div>
+        <div class="hud-border bottom-left"></div>
+        <div class="hud-border bottom-right"></div>
+        <div class="hud-scanline"></div>
+        <div class="hud-grid-bg"></div>
+    </div>
 
     <main id="app">
         <!-- PAGE 1: IDENTITY INPUT -->
@@ -49,8 +61,8 @@
                 <div class="panel panel-left">
                     <div class="panel-header">HOUSING ALLOCATION FEED</div>
                     <div class="map-container">
-                        <!-- Live Map Feed (Static Fallback) -->
-                        <div class="map-frame"></div>
+                        <!-- Live Map Feed -->
+                        <canvas id="mapCanvas" width="741" height="606"></canvas>
 
                         <!-- Digital Overlay -->
                         <div class="map-grid-overlay"></div>
@@ -97,8 +109,57 @@
                         <video id="camera-feed" autoplay playsinline muted></video>
                         <canvas id="photo-canvas" class="hidden"></canvas>
                         <div id="scan-overlay" class="scan-overlay">
-                            <div class="scan-line"></div>
-                            <div class="scan-text">SCANNING SUBJECT...</div>
+                            <!-- Digital Face Mesh -->
+                            <div id="face-mesh-container">
+                                <!-- Rotating Ring -->
+                                <div class="scan-ring"></div>
+
+                                <!-- Laser Line -->
+                                <div class="scan-laser"></div>
+
+                                <!-- Brackets -->
+                                <div class="face-brackets">
+                                    <div class="fb-corner fb-tl"></div>
+                                    <div class="fb-corner fb-tr"></div>
+                                    <div class="fb-corner fb-bl"></div>
+                                    <div class="fb-corner fb-br"></div>
+                                </div>
+
+                                <svg id="face-mesh-svg" viewBox="0 0 200 250" preserveAspectRatio="xMidYMid meet">
+                                    <defs>
+                                        <filter id="glow-mesh">
+                                            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur" />
+                                                <feMergeNode in="SourceGraphic" />
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+                                    <g class="mesh-group" filter="url(#glow-mesh)">
+                                        <!-- Outer Face -->
+                                        <path d="M30,80 Q100,240 170,80 L170,60 Q100,-20 30,60 Z"
+                                            fill="rgba(0,255,255,0.05)" stroke="var(--neon-cyan)" stroke-width="1.5" />
+                                        <!-- Vertical Center -->
+                                        <line x1="100" y1="20" x2="100" y2="220" stroke="var(--neon-cyan)"
+                                            stroke-width="1" stroke-dasharray="2,2" />
+                                        <!-- Horizontal Eyes -->
+                                        <line x1="30" y1="80" x2="170" y2="80" stroke="var(--neon-cyan)"
+                                            stroke-width="1" />
+                                        <!-- Triangulation Lines -->
+                                        <path d="M30,80 L100,20 L170,80 L100,150 Z" fill="none"
+                                            stroke="var(--neon-cyan)" stroke-width="1" opacity="0.6" />
+                                        <path d="M30,80 L100,220 L170,80" fill="none" stroke="var(--neon-cyan)"
+                                            stroke-width="1" opacity="0.6" />
+                                        <!-- Nodes -->
+                                        <circle cx="30" cy="80" r="3" fill="#fff" />
+                                        <circle cx="170" cy="80" r="3" fill="#fff" />
+                                        <circle cx="100" cy="20" r="3" fill="#fff" />
+                                        <circle cx="100" cy="150" r="3" fill="#fff" />
+                                        <circle cx="100" cy="220" r="3" fill="#fff" />
+                                    </g>
+                                </svg>
+                            </div>
+                            <div class="scan-text">INITIALIZING BIOMETRICS...</div>
                         </div>
                         <div class="fallback-silhouette" id="camera-fallback" style="display: none;">
                             <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='cyan' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
@@ -153,6 +214,8 @@
 
         <!-- PAGE 3: ALLOCATION VERDICT -->
         <section id="screen-verdict" class="screen hidden">
+            <canvas id="utopia-fireworks"></canvas>
+            <canvas id="dystopia-hazard"></canvas>
             <div class="verdict-container">
                 <div id="verdict-status" class="verdict-status">PROCESSING...</div>
 
@@ -179,6 +242,10 @@
 
     </main>
 
+    <!-- Libraries -->
+    <script src="tracking-min.js"></script>
+    <script src="face-min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="app.js"></script>
 </body>
 
